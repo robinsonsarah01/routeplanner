@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-import operator
+from treeelements import *
 
 
 class OsmDataReader:
@@ -12,14 +12,15 @@ class OsmDataReader:
     def __init__(self, filename):
         """
          The constructor takes one argument: the filename to read data from.
-         It instantiates the instance variables of the 
+         It instantiates the instance variables of the class.
         """
         self.tree = ET.parse(filename)
-        self.nodes = {}
+        self.nodes = {} # all the xml node elements
         self.ways = {}
+        self.wayElts = {} # the object wrappers around the ways
         self.relations = {}
         self.roads = {} # All ways with a 'highway' tag
-        self.graphnodes = {} # The nodes that relate to roads/ways and therefore we care about
+        self.graphnodes = {} # The nodes that relate to roads and that therefore we care about
     
     def sortElements(self):
         root = self.tree.getroot()
@@ -43,25 +44,42 @@ class OsmDataReader:
                     self.roads[id] = way
                     way.set("highway",tag_elt.attrib["v"])
             
-    def buildSearchGraph(self):
+    def buildNodesAndWays(self):
         counter = 0
         for id in self.roads:
-            if counter > 5:
-                break
-            counter += 1
+            # if counter > 25:
+                # break
+            # counter += 1
             
-            road = self.roads[id]
-            # print id, road.attrib["highway"]
+            road = self.roads[id] # the way/road we're currently looking at
+            currWay = Way(road, id)
+            
+            prevNodeObj = None # the previously created node object
             relatednodes = road.findall("nd")
-            for nd in relatednodes:
+            for nd in relatednodes: # for each of the nodes in the way, create a node object in the search graph
                 ndid = nd.attrib["ref"]
-                if ndid in self.nodes: # the node is most likely there, but to be safe
+                if ndid in self.nodes: # the node is most likely there, but to be safe we check for existence
                     # "nodes defining the geometry of the way are enumerated in the correct order"
-                    print self.nodes[ndid].attrib["lat"],self.nodes[ndid].attrib["lon"]
-                    #pass
-                    # TODO create a graph node class and create the nodes here
-                    # if it exists, just add its connections & relate it to the way
-                    # else, create it and link it back to its way
+                    # Do the graph-building stuff
+                    currNode = None
+                    if ndid in self.graphnodes: # node already exists
+                        currNode = self.graphnodes[ndid]
+                        # TESTING
+                        # print "already in graph", [ x.getRoadType() for x in currNode.getContainingWays() ]
+                        # print currNode.getNeighbors()
+                    else: # node hasn't been instantiated yet, so create it
+                        nodeelt = self.nodes[ndid]
+                        self.graphnodes[ndid] = Node(nodeelt, ndid)
+                        currNode = self.graphnodes[ndid]                    
+                    if prevNodeObj: # add the previous node as a neighbor
+                        currNode.addNeighbor(prevNodeObj)
+                    else: # this is the first node in the list
+                        currWay.setFirstNode(currNode)
+                    currNode.addToWay(currWay) # reference its containing way element
+                    prevNodeObj = currNode # we're done, so curr becomes prev
+            
+            # prevNodeObj is now the last node
+            currWay.setLastNode(prevNodeObj)
         
         
     def applyRelations(self):
@@ -82,12 +100,18 @@ class OsmDataReader:
             for child in self.relations[id]:
                 print child.tag, child.attrib
             print "\n"
+            
+    def createSearchGraph(self):
+        mhcdata.sortElements()
+        mhcdata.getRoads()
+        mhcdata.buildNodesAndWays()
+        # mhcdata.applyRelations()
+        
+        return self.graphnodes
         
 
 # TESTING
 if __name__ == "__main__":
     mhcdata = OsmDataReader("mhc.osm.xml")
-    mhcdata.sortElements()
-    mhcdata.getRoads()
-    mhcdata.buildSearchGraph()
-    mhcdata.applyRelations()
+    mhcdata.createSearchGraph()
+    
