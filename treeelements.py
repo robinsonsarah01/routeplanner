@@ -5,8 +5,8 @@ class Node:
     def __init__(self, nodeelt, nodeid):
         self.elt = nodeelt # the original xml element
         self.id = nodeid
-        self.lat = nodeelt.attrib["lon"]
-        self.lon = nodeelt.attrib["lat"]
+        self.lon = nodeelt.attrib["lon"]
+        self.lat = nodeelt.attrib["lat"]
         self.inWays = []
         self.neighbors = [] # list of node objects
     
@@ -73,20 +73,21 @@ class Way:
 
 class Relation:
 
-    def __init__(self, relationelt):
+    def __init__(self, relationelt, rid, rtype, routename = None):
         self.elt = relationelt # the original xml element
-        self.type = ""
-        self.id = ""
+        self.type = rtype
+        self.id = rid
+        self.name = routename
         
-    def getName():
+    def getRouteName(self):
         """
          Depends on relation type. If it's a route, returns
          the name of the route. Otherwise, returns None. 
         """
-        pass
+        return self.name
         
-    def getRelationType():
-        pass
+    def getType(self):
+        return self.type
         
     def getId(self):
         return self.id
