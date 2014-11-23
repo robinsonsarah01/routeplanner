@@ -34,16 +34,21 @@ class OsmDataReader:
                 self.ways[id] = child
             elif child.tag == "relation":
                 self.relations[id] = child
-                print "found relation"
                 
-    def getRoads(self):
+    def getRoads(self, footways = False):
+        """
+         Get all the ways that are roads (some are other things).
+         If True is passed as a parameter, footways (pedestrian paths) are included.
+         This is by default false.
+        """
         for id in self.ways:
             way = self.ways[id]
             tag_elements = way.findall("tag")
             for tag_elt in tag_elements:
                 if tag_elt.attrib["k"] == "highway":
-                    self.roads[id] = way
-                    way.set("highway",tag_elt.attrib["v"])
+                    if footways or (tag_elt.attrib["v"] != "footway" and tag_elt.attrib["v"] != "steps"):
+                        self.roads[id] = way
+                        way.set("highway",tag_elt.attrib["v"])
             
     def buildNodesAndWays(self):
         counter = 0
@@ -105,9 +110,9 @@ class OsmDataReader:
                     print "-- type", tag_elt.attrib["v"]
             print "\n"
             
-    def createSearchGraph(self):
+    def createSearchGraph(self, pedestrian = False):
         mhcdata.sortElements()
-        mhcdata.getRoads()
+        mhcdata.getRoads(pedestrian)
         mhcdata.buildNodesAndWays()
         mhcdata.applyRelations()
         
