@@ -34,6 +34,7 @@ class OsmDataReader:
                 self.ways[id] = child
             elif child.tag == "relation":
                 self.relations[id] = child
+                print "found relation"
                 
     def getRoads(self):
         for id in self.ways:
@@ -90,22 +91,25 @@ class OsmDataReader:
          
          Also group together ways as a road. See http://wiki.openstreetmap.org/wiki/Relation:route
          
-         Should take params to determine what type of vehicle is being used.
+         Should possibly take params to determine what type of vehicle is being used.
         """
-        counter = 0
         for id in self.relations:
-            if counter > 5:
-                break
-            counter += 1
-            for child in self.relations[id]:
-                print child.tag, child.attrib
+            print "RELATION", self.relations[id].attrib
+            tag_elements = self.relations[id].findall("tag")
+            for tag_elt in tag_elements:
+                if tag_elt.attrib["k"] == "ref":
+                    print "ref", tag_elt.attrib["v"]
+                elif tag_elt.attrib["k"] == "route":
+                    print "route", tag_elt.attrib["v"]
+                elif tag_elt.attrib["k"] == "type":
+                    print "-- type", tag_elt.attrib["v"]
             print "\n"
             
     def createSearchGraph(self):
         mhcdata.sortElements()
         mhcdata.getRoads()
         mhcdata.buildNodesAndWays()
-        # mhcdata.applyRelations()
+        mhcdata.applyRelations()
         
         return self.graphnodes
         
