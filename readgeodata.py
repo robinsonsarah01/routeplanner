@@ -16,11 +16,12 @@ class OsmDataReader:
         """
         self.tree = ET.parse(filename)
         self.nodes = {} # all the xml node elements
+        self.graphnodes = {} # The nodes objs that relate to roads and that therefore we care about
         self.ways = {}
-        self.wayElts = {} # the object wrappers around the ways
-        self.relations = {}
         self.roads = {} # All ways with a 'highway' tag
-        self.graphnodes = {} # The nodes that relate to roads and that therefore we care about
+        self.wayObjs = {} # the object wrappers around the ways
+        self.relations = {}
+        self.relationObjs = {} # the object wrappers around the relations
     
     def sortElements(self):
         root = self.tree.getroot()
@@ -59,6 +60,7 @@ class OsmDataReader:
             
             road = self.roads[id] # the way/road we're currently looking at
             currWay = Way(road, id)
+            self.wayObjs[id] = currWay
             
             prevNodeObj = None # the previously created node object
             relatednodes = road.findall("nd")
@@ -90,25 +92,41 @@ class OsmDataReader:
         
     def applyRelations(self):
         """
+         Processes relations.
+         Groups together ways as a road. See http://wiki.openstreetmap.org/wiki/Relation:route
+        
+         Not dealt w/ because of limited data set:
          Apply turn bans (remove connections b/w graph nodes),
-         apply restrictions (remove roads restricted to bikes),
-         etc. See http://wiki.openstreetmap.org/wiki/Relation:restriction 
-         
-         Also group together ways as a road. See http://wiki.openstreetmap.org/wiki/Relation:route
-         
+         etc. See http://wiki.openstreetmap.org/wiki/Relation:restriction          
          Should possibly take params to determine what type of vehicle is being used.
         """
         for id in self.relations:
-            print "RELATION", self.relations[id].attrib
-            tag_elements = self.relations[id].findall("tag")
+            relation = self.relations[id]
+            type = ""
+            name = None
+            tag_elements = relation.findall("tag")
             for tag_elt in tag_elements:
                 if tag_elt.attrib["k"] == "ref":
-                    print "ref", tag_elt.attrib["v"]
-                elif tag_elt.attrib["k"] == "route":
-                    print "route", tag_elt.attrib["v"]
+                    name = tag_elt.attrib["v"]
+                # elif tag_elt.attrib["k"] == "route": # don't really need this
+                    # print "route", tag_elt.attrib["v"]
                 elif tag_elt.attrib["k"] == "type":
-                    print "-- type", tag_elt.attrib["v"]
-            print "\n"
+                    type = tag_elt.attrib["v"]
+            if type != "route" and type != "restriction": # ignore things that aren't routes or restrictions
+                continue
+            self.relationObjs[id] = Relation(relation, id, type, name) # Create the relation object
+            currRelation = self.relationObjs[id]
+            
+            member_elts = relation.findall("member") # get all the ways/nodes in the relation
+            for m_elt in member_elts:
+                if m_elt.attrib["type"] != "way": # For now, ignore all members that aren't ways
+                    continue
+                mid = m_elt.attrib["ref"]
+                if mid in self.wayObjs: # some/most ways in the relation are not within our data's scope
+                    way = self.wayObjs[mid]
+                    way.addToRelation(currRelation)
+                    # unfortunately it seems that the ways aren't enumerated in order in the relation
+                    # so we can't connect the first node and the last node in neighbouring ways
             
     def createSearchGraph(self, pedestrian = False):
         mhcdata.sortElements()
