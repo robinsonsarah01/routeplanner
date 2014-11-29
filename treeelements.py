@@ -1,4 +1,3 @@
-from readgeodata import OsmDataReader
 
 class Node:
 
