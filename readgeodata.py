@@ -129,10 +129,10 @@ class OsmDataReader:
                     # so we can't connect the first node and the last node in neighbouring ways
             
     def createSearchGraph(self, pedestrian = False):
-        mhcdata.sortElements()
-        mhcdata.getRoads(pedestrian)
-        mhcdata.buildNodesAndWays()
-        mhcdata.applyRelations()
+        self.sortElements()
+        self.getRoads(pedestrian)
+        self.buildNodesAndWays()
+        self.applyRelations()
         
         return self.graphnodes
         
