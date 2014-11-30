@@ -11,6 +11,7 @@
       #form-div input[type=text] { margin-right: 1em; }
       #form-div input[type=submit] { margin-left: 1em; }
       #form-div input { margin-left: .2em; }
+      #form-div input.not-for-input { background-color: lightgray; user-select: none; }
     </style>
     
     <script type="text/javascript"
@@ -80,13 +81,21 @@
     <div id="form-div"><center>
         <span>Click a blue marker on the map to start a search from that position.</span>
         <form name="search-form" action="" method="POST">
-            <label>Latitude:</label><input type="text" id="node-lat" name="node-lat" disabled>
-            <label>Longitude:</label><input type="text" id="node-lon" name="node-lon" disabled>
-            <label>Node ID:</label><input type="text" id="node-id" name="node-id" disabled>
+            <label>Latitude:</label><input type="text" id="node-lat" name="node-lat" class="not-for-input">
+            <label>Longitude:</label><input type="text" id="node-lon" name="node-lon" class="not-for-input">
+            <label>Node ID:</label><input type="text" id="node-id" name="node-id" class="not-for-input">
             <br />
             <label>Curvature:</label>
             <input type="radio" name="curvature" value="minimize" checked><label>Minimize</label>
             <input type="radio" name="curvature" value="maximize"><label>Maximize</label>
+            <br />
+            <label>Distance constraint:</label>
+            <input type="radio" name="distance" id="distance-5" value=5><label>5</label>
+            <input type="radio" name="distance" id="distance-10" value=10><label>10</label>
+            <input type="radio" name="distance" id="distance-15" value=15><label>15</label>
+            <input type="radio" name="distance" id="distance-20" value=20 checked><label>20</label>
+            <input type="radio" name="distance" id="distance-25" value=25><label>25</label>
+            <br />
             <input type="submit" value="Search">
         </form>
     </center></div>
