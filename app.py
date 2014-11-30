@@ -2,7 +2,7 @@ from flask import Flask, render_template, request
 from readgeodata import OsmDataReader
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/', methods=["GET","POST"])
 def home():
     if request.method == "GET":
         datareader = OsmDataReader("mhc.osm.xml")

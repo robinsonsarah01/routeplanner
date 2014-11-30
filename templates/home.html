@@ -6,21 +6,42 @@
     
     <style type="text/css">
       html, body { height: 100%; margin: 0; padding: 0;}
-      #map-canvas { height: 90%; margin: 1em; padding: 0; }
+      #map-canvas { height: 50%; margin: 2em; padding: 0; }
     </style>
     
     <script type="text/javascript"
-      src="https://maps.googleapis.com/maps/api/js?key=PLACEHOLDER_NO_KEY">
+      src="https://maps.googleapis.com/maps/api/js?key=API_KEY_HERE">
     </script>
     <script type="text/javascript">
       function initialize() {
         var mapOptions = {
-          center: { lat: -34.397, lng: 150.644},
-          zoom: 8
+          center: { lat: 42.2569349, lng: -72.5735186},
+          zoom: 15
         };
         var map = new google.maps.Map(document.getElementById('map-canvas'),
             mapOptions);
+            
+        initMarkers(map);
       }
+      
+      function initMarkers(map){
+        var graphNodePoints = [];
+        
+        {% for id, node in graphnodes.iteritems() %}
+        graphNodePoints.push( new google.maps.LatLng( {{ node.lat }} , {{ node.lon }} ) );
+        {% endfor %}
+        
+        //console.log(graphNodePoints);
+        
+        for (var i = 0; i < graphNodePoints.length; i++){
+            var marker = new google.maps.Marker({
+                position: graphNodePoints[i],
+                map: map
+            });
+        }
+      }
+      
+      
       google.maps.event.addDomListener(window, 'load', initialize);
     </script>
   </head>
@@ -30,8 +51,8 @@
     
     <div id="map-nodes-data">
         <ul>
-        {% for node in graphnodes %}
-            <li>some graph node {{ node }}</li>
+        {% for id, node in graphnodes.iteritems() %}
+            <li>some graph node {{ node.lat }} , {{ node.lon }} </li>
         {% endfor %}
         </ul>
     </div>
