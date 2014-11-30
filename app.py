@@ -16,8 +16,8 @@ def home():
         return render_template("home.html",graphnodes=searchnodes)
     elif request.method == "POST":
         startid = request.form["node-id"]
-        if startid not in searchnodes:
-            return "Search not started; id %s not a valid node id." % startid
+        if not startid or startid not in searchnodes:
+            return "Search not started; id '%s' not a valid node id." % startid
         curvature = request.form["curvature"]
         distanceconstraint = request.form["distance"]
         return "Search started with id %s, aiming to %s curvature of route. Max distance is %s." % (startid, curvature, distanceconstraint)
