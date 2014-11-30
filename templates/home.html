@@ -6,13 +6,21 @@
     
     <style type="text/css">
       html, body { height: 100%; margin: 0; padding: 0;}
-      #map-canvas { height: 50%; margin: 2em; padding: 0; }
+      #map-canvas { height: 70%; margin: 2em; padding: 0; }
+      #form-div { line-height: 2em; }
+      #form-div input[type=text] { margin-right: 1em; }
+      #form-div input[type=submit] { margin-left: 1em; }
+      #form-div input { margin-left: .2em; }
     </style>
     
     <script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?key=API_KEY_HERE">
     </script>
     <script type="text/javascript">
+      var idInput;
+      var latInput;
+      var lonInput;
+    
       function initialize() {
         var mapOptions = {
           center: { lat: 42.2569349, lng: -72.5735186},
@@ -22,25 +30,46 @@
             mapOptions);
             
         initMarkers(map);
+        
+        idInput = document.getElementById("node-id");
+        latInput = document.getElementById("node-lat");
+        lonInput = document.getElementById("node-lon");
       }
       
       function initMarkers(map){
         var graphNodePoints = [];
+        var currNode = undefined;
         
         {% for id, node in graphnodes.iteritems() %}
-        graphNodePoints.push( new google.maps.LatLng( {{ node.lat }} , {{ node.lon }} ) );
+        currNode = new google.maps.LatLng( {{ node.lat }} , {{ node.lon }} );
+        currNode['graphnodeid'] = {{ id }} ;
+        graphNodePoints.push( currNode );
         {% endfor %}
-        
-        //console.log(graphNodePoints);
         
         for (var i = 0; i < graphNodePoints.length; i++){
             var marker = new google.maps.Marker({
                 position: graphNodePoints[i],
-                map: map
+                map: map,
+                /*icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 2
+                }*/
+                icon: "/static/tinymarkerblue.png"
             });
+            
+            google.maps.event.addListener(marker, "click", markerListener);
         }
+        
       }
       
+      function markerListener(event){
+        if (event.latLng){
+            var markerPos = event.latLng;
+            idInput.value = markerPos['graphnodeid'];
+            latInput.value = markerPos.lat();
+            lonInput.value = markerPos.lng();
+        }
+      }
       
       google.maps.event.addDomListener(window, 'load', initialize);
     </script>
@@ -48,13 +77,18 @@
   
   <body>
     <div id="map-canvas"></div>
-    
-    <div id="map-nodes-data">
-        <ul>
-        {% for id, node in graphnodes.iteritems() %}
-            <li>some graph node {{ node.lat }} , {{ node.lon }} </li>
-        {% endfor %}
-        </ul>
-    </div>
+    <div id="form-div"><center>
+        <span>Click a blue marker on the map to start a search from that position.</span>
+        <form name="search-form" action="" method="POST">
+            <label>Latitude:</label><input type="text" id="node-lat" name="node-lat" disabled>
+            <label>Longitude:</label><input type="text" id="node-lon" name="node-lon" disabled>
+            <label>Node ID:</label><input type="text" id="node-id" name="node-id" disabled>
+            <br />
+            <label>Curvature:</label>
+            <input type="radio" name="curvature" value="minimize" checked><label>Minimize</label>
+            <input type="radio" name="curvature" value="maximize"><label>Maximize</label>
+            <input type="submit" value="Search">
+        </form>
+    </center></div>
   </body>
 </html>
