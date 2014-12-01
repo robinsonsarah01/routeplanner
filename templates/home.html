@@ -41,11 +41,13 @@
         var graphNodePoints = [];
         var currNode = undefined;
         
+        {% if graphnodes %}
         {% for id, node in graphnodes.iteritems() %}
         currNode = new google.maps.LatLng( {{ node.lat }} , {{ node.lon }} );
         currNode['graphnodeid'] = {{ id }} ;
         graphNodePoints.push( currNode );
         {% endfor %}
+        {% endif %}
         
         for (var i = 0; i < graphNodePoints.length; i++){
             var marker = new google.maps.Marker({
@@ -79,11 +81,18 @@
   <body>
     <div id="map-canvas"></div>
     <div id="form-div"><center>
+        {% if searchresult %}
+        <span>Search results are shown above. <a href="/">Refresh the page</a> to begin again.</span>
+        {% else %}
         <span>Click a blue marker on the map to start a search from that position.</span>
+        {% endif %}
         <form name="search-form" action="" method="POST">
-            <label>Latitude:</label><input type="text" id="node-lat" name="node-lat" class="not-for-input">
-            <label>Longitude:</label><input type="text" id="node-lon" name="node-lon" class="not-for-input">
-            <label>Node ID:</label><input type="text" id="node-id" name="node-id" class="not-for-input">
+            <label>Latitude:</label>
+            <input type="text" id="node-lat" name="node-lat" class="not-for-input" readonly>
+            <label>Longitude:</label>
+            <input type="text" id="node-lon" name="node-lon" class="not-for-input" readonly>
+            <label>Node ID:</label>
+            <input type="text" id="node-id" name="node-id" class="not-for-input" readonly>
             <br />
             <label>Curvature:</label>
             <input type="radio" name="curvature" value="minimize" checked><label>Minimize</label>
