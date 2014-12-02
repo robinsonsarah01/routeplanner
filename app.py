@@ -21,8 +21,8 @@ def home():
             return "Search not started; id '%s' not a valid node id." % startid
         curvature = request.form["curvature"]
         distanceconstraint = request.form["distance"]
-        # for now, we ignore curvature and startid
-        reslist = routesearch.startSearch(int(distanceconstraint))
+        # for now, we ignore curvature
+        reslist = routesearch.searchFromPoint(startid,int(distanceconstraint))
         # translate result infor the form expected by the template, ie a dict keyed by id
         searchresultnodes = {}
         for n in reslist:
