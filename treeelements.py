@@ -62,6 +62,13 @@ class Way:
     def getRoadType(self):
         return self.highwayType
         
+    def getRoadName(self):
+        for child in self.elt:
+            if "k" in child.attrib and child.attrib["k"] == "name":
+                return child.attrib["v"]
+        # if we get here this road has no name attribute
+        return False
+        
     def addToRelation(self, relation):
         if relation not in self.inRelations:
             self.inRelations.append(relation)
