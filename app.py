@@ -23,7 +23,7 @@ def home():
         curvature = request.form["curvature"]
         distanceconstraint = request.form["distance"]
         # for now, we ignore curvature preference
-        reslist = routesearch.searchFromPoint(startid,int(distanceconstraint))
+        reslist = routesearch.searchFromPoint(startid,float(distanceconstraint))
         # get directions
         dirstring = makedirections.generateDirections(reslist)
         # translate result infor the form expected by the template, ie a dict keyed by id
