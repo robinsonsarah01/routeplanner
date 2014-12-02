@@ -8,6 +8,7 @@
       html, body { height: 100%; margin: 0; padding: 0;}
       #map-canvas { height: 70%; margin: 2em; padding: 0; }
       #form-div { line-height: 2em; }
+      span#directions { line-height: 1em; }
       #form-div input[type=text] { margin-right: 1em; }
       #form-div input[type=submit] { margin-left: 1em; }
       #form-div input { margin-left: .2em; }
@@ -82,7 +83,14 @@
     <div id="map-canvas"></div>
     <div id="form-div"><center>
         {% if searchresult %}
-        <span>Search results are shown above. <a href="/">Refresh the page</a> to begin again.</span>
+        <span>Search results are shown above. </span>
+        {% if directions %}
+        <br />
+        <strong>Directions:</strong>
+        <span id="directions">{{ directions }}</span>
+        <br />
+        {% endif %}
+        <span><a href="/">Refresh the page</a> to begin again.</span>
         {% else %}
         <span>Click a blue marker on the map to start a search from that position.</span>
         {% endif %}
