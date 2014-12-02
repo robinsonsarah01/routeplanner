@@ -35,7 +35,7 @@ def generateDirections(nodelist):
                     newRoad = True
                     print "road changed"
                     
-        print newRoad
+        # print newRoad
             
         list.sort(currRoad) # make sure the roads are always in the same order
         
@@ -44,7 +44,7 @@ def generateDirections(nodelist):
             # also, since we just started, generate the first sentence in the directions here
             roadname = getRoadNames(currRoad)
             if not roadname:
-                roadname = " the road with no name."
+                roadname = "the road with no name"
             directions += " " + roadname + "."
         
         elif newRoad: # else check if we have changed roads between iterations
@@ -142,9 +142,8 @@ def getBearing(start,end):
 if __name__ == "__main__":
     # create test list
     #testids = ["72088866","1354509391","2133302537","72053830","1353506942","2133302496","72062153","72075396","72084662","72014487","71987051","72066712"] # these aren't actually all neighbours
-    testids = routesearch.startSearch(20)
     mhcdata = OsmDataReader("mhc.osm.xml")
     searchnodes = mhcdata.createSearchGraph()
-    testlist = [ searchnodes[id] for id in testids ]
+    testlist = routesearch.startSearch(20) # [ searchnodes[id] for id in testids ]
     dir = generateDirections(testlist)
     print dir

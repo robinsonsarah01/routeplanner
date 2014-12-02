@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 from readgeodata import OsmDataReader
+import routesearch
 app = Flask(__name__)
 
 # Init graph here so we only do it once, for efficiency
@@ -20,8 +21,14 @@ def home():
             return "Search not started; id '%s' not a valid node id." % startid
         curvature = request.form["curvature"]
         distanceconstraint = request.form["distance"]
-        return "Search started with id %s, aiming to %s curvature of route. Max distance is %s." % (startid, curvature, distanceconstraint)
-        # return render_template("home.html",graphnodes=searchresultnodes,searchresult=True)
+        # for now, we ignore curvature and startid
+        reslist = routesearch.startSearch(int(distanceconstraint))
+        # translate result infor the form expected by the template, ie a dict keyed by id
+        searchresultnodes = {}
+        for n in reslist:
+            searchresultnodes[n.getId()] = n
+        # return "Search started with id %s, aiming to %s curvature of route. Max distance is %s." % (startid, curvature, distanceconstraint)
+        return render_template("home.html",graphnodes=searchresultnodes,searchresult=True)
     
 if __name__ == "__main__":
     app.debug = True
