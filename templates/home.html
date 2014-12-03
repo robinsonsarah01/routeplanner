@@ -82,7 +82,14 @@
     <div id="map-canvas"></div>
     <div id="form-div"><center>
         {% if searchresult %}
-        <span>Search results are shown above. <a href="/">Refresh the page</a> to begin again.</span>
+        <span>Search results are shown above. </span>
+        {% if directions %}
+        <br />
+        <strong>Directions:</strong>
+        <span id="directions">{{ directions }}</span>
+        <br />
+        {% endif %}
+        <span><a href="/">Refresh the page</a> to begin again.</span>
         {% else %}
         <span>Click a blue marker on the map to start a search from that position.</span>
         {% endif %}
