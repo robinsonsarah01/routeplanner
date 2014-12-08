@@ -2,7 +2,6 @@ import util
 import copy
 
 from readgeodata import OsmDataReader
-import xml.etree.ElementTree as ET
 
 totalDistance = 0 # keep track of accrued cost a.k.a. distance
 routes = {} # stop adding to routes when all nodes expanded
@@ -22,6 +21,7 @@ def allNodesSearched():
 
 def routeComplete():
     """ stop expanding nodes for a route when the distance constraint is reached"""
+    print "maxDistance", maxDistance
     if totalDistance >= maxDistance:
         # maybe we can refine this to be a softer constraint on distance
         return True
@@ -30,20 +30,27 @@ def routeComplete():
 
 def startSearch(constraint):
     """initialize search"""
+    # global maxDistance
+    # maxDistance = constraint
+    # mhcdata = OsmDataReader("mhc.osm.xml")
+    # graph = mhcdata.createSearchGraph()
+    # treeString = ET.tostring(tree, "us-ascii", "text")
+    # printDict(graph)
+
+    # TODO: make start another parameter for startSearch
+    # start = graph['72028025'] # for now, initialize start = root
+    # return aStarSearch(start, graph)
+    return searchFromPoint('72028025',constraint)
+    
+def searchFromPoint(startid, constraint):
+    """ init search from a specific point """
     global maxDistance
     maxDistance = constraint
     mhcdata = OsmDataReader("mhc.osm.xml")
     graph = mhcdata.createSearchGraph()
-    #treeString = ET.tostring(tree, "us-ascii", "text")
-    #printDict(graph)
-
-    # TODO: make start another parameter for startSearch
-    start = graph['72028025'] # for now, initialize start = root
+    
+    start = graph[startid]
     return aStarSearch(start, graph)
-
-def printDict(something):
-    for key in something:
-        print "key: ", key, " value: ", something[key]
 
 def aStarSearch(start, tree):
     """Search the node that has the lowest combined cost and heuristic first."""
@@ -87,12 +94,12 @@ def aStarSearch(start, tree):
                 # nodes from the osm xml were added in points where the road curved,
                 # so getting manhattan distance between nodes does give good approximation of actual distance between nodes
                 totalDistance += manhattanDistance(node, nextNode) # cumulative distance to this node
+                print "totalDistance", totalDistance
                 gCost = 1
 
                 hEst = curvatureHeuristic(start, nextNode)
-                # fCost maybe incorporating total distance in here does not make sense.
                 fCost = gCost - hEst
-                print "fCost of", nextNode.getId(), " = ", fCost 
+                print "fCost", fCost
 
                 # push a new tuple onto the fringe, using fCost as an indicator of priority
                 finalPath = copy.copy(tempPath)
@@ -100,10 +107,10 @@ def aStarSearch(start, tree):
                 fringe.push(pushThis, fCost)
 
                 tempPath = [] # clear tempPath
-    print ""
-    print "finalPath:"
-    for node in finalPath:
-    	print node.getId()
+    # print ""
+    # print "finalPath:"
+    # for node in finalPath:
+    # 	print node.getId()
     
     return finalPath
 
@@ -127,7 +134,6 @@ def manhattanDistance(currPos, nextPos):
     xy1 = currPos
     xy2 = nextPos
     distance = abs(float(xy1.getLat()) - float(xy2.getLat())) + abs(float(xy1.getLon()) - float(xy2.getLon()))
-    print "distance between", currPos.getId(), " and ", nextPos.getId(), " = ", distance
     return distance
 
 
@@ -135,4 +141,4 @@ def manhattanDistance(currPos, nextPos):
 if __name__ == "__main__":
     print ""
     print ""
-    startSearch(20)
+    startSearch(0.3)

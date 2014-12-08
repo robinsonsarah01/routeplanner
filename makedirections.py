@@ -1,8 +1,8 @@
 from treeelements import *
 import math
 # below only used in testing, remove later
-from readgeodata import *
-import routesearch
+# from readgeodata import *
+# import routesearch
 
 def generateDirections(nodelist):
     """
@@ -35,7 +35,7 @@ def generateDirections(nodelist):
                     newRoad = True
                     print "road changed"
                     
-        print newRoad
+        # print newRoad
             
         list.sort(currRoad) # make sure the roads are always in the same order
         
@@ -44,7 +44,7 @@ def generateDirections(nodelist):
             # also, since we just started, generate the first sentence in the directions here
             roadname = getRoadNames(currRoad)
             if not roadname:
-                roadname = " the road with no name."
+                roadname = "the road with no name"
             directions += " " + roadname + "."
         
         elif newRoad: # else check if we have changed roads between iterations
@@ -78,16 +78,20 @@ def generateNextDirection(curr,next):
      Right: next - curr < 0 OR next - curr > 180 > 0
      Straght: abs(next - curr) < 15 or next - curr > 345
     """
+    error = 10
     diff = next - curr
-    print diff
     if abs(diff) < 15 or diff > 345:
+        print diff, "straight"
         return "Go straight","on to"
-    if 90 > diff and diff > 0:
-        return "Turn left","onto"
+    if 90 + error > diff and diff > 0:
+        print diff, "right"
+        return "Turn right","onto"
     # all other cases are right
     # (the above may not be true; check later.)
-    return "Turn right","onto"
-    # return "Turn", "onto"
+    if diff < 0 or diff > 180 + error:
+        print diff, "left"
+        return "Turn left","onto"
+    return "Turn", "onto"
     
     
 def getRoadNames(currRoad):
@@ -142,9 +146,10 @@ def getBearing(start,end):
 if __name__ == "__main__":
     # create test list
     #testids = ["72088866","1354509391","2133302537","72053830","1353506942","2133302496","72062153","72075396","72084662","72014487","71987051","72066712"] # these aren't actually all neighbours
-    testids = routesearch.startSearch(20)
-    mhcdata = OsmDataReader("mhc.osm.xml")
-    searchnodes = mhcdata.createSearchGraph()
-    testlist = [ searchnodes[id] for id in testids ]
-    dir = generateDirections(testlist)
-    print dir
+    # mhcdata = OsmDataReader("mhc.osm.xml")
+    # searchnodes = mhcdata.createSearchGraph()
+    # testlist = routesearch.startSearch(20) # [ searchnodes[id] for id in testids ]
+    # dir = generateDirections(testlist)
+    # print dir
+    pass
+    
