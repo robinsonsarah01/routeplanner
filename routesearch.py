@@ -12,6 +12,7 @@ maxDistance = 0
 def isGoalState():
     """ stop searching for routes when all the nodes expanded or route length is complete"""
     if allNodesSearched() or routeComplete():
+        print "goal state"
         return True
     else:
         return False
@@ -24,6 +25,7 @@ def routeComplete():
     """ stop expanding nodes for a route when the distance constraint is reached"""
     if totalDistance >= maxDistance:
         # maybe we can refine this to be a softer constraint on distance
+        print maxDistance
         return True
     else:
         return False
@@ -39,9 +41,11 @@ def startSearch(constraint):
 
     # TODO: make start another parameter for startSearch
     start = graph['72028025'] # for now, initialize start = root
-    return aStarSearch(start, graph)
+    print "start", start
+    aStarSearch(start, graph)
 
 def printDict(something):
+    print "graph[0]"
     for key in something:
         print "key: ", key, " value: ", something[key]
 
@@ -60,6 +64,7 @@ def aStarSearch(start, tree):
     # get the start state
     currLat = start.getLat()
     currLon = start.getLon()
+    print "currLat:", currLat, " currLon:", currLon
 
     # initialize search by pushing start node to front of priority queue
     fringe.push((start, [start]), 1)
@@ -75,6 +80,7 @@ def aStarSearch(start, tree):
         nextNodes = node.getNeighbors()
 
         for nextNode in nextNodes:
+            print "nextNode ", nextNode.getId()
             # copy current path
             tempPath = copy.copy(path)
 
@@ -87,25 +93,19 @@ def aStarSearch(start, tree):
                 # nodes from the osm xml were added in points where the road curved,
                 # so getting manhattan distance between nodes does give good approximation of actual distance between nodes
                 totalDistance += manhattanDistance(node, nextNode) # cumulative distance to this node
-                gCost = 1
+                gCost = totalDistance
 
                 hEst = curvatureHeuristic(start, nextNode)
                 # fCost maybe incorporating total distance in here does not make sense.
                 fCost = gCost - hEst
-                print "fCost of", nextNode.getId(), " = ", fCost 
 
                 # push a new tuple onto the fringe, using fCost as an indicator of priority
-                finalPath = copy.copy(tempPath)
-                pushThis = (nextNode, finalPath)
+                pushThis = (nextNode, copy.copy(tempPath), addDistance)
                 fringe.push(pushThis, fCost)
 
                 tempPath = [] # clear tempPath
-    print ""
-    print "finalPath:"
-    for node in finalPath:
-    	print node.getId()
-    
-    return finalPath
+
+    return None
 
 def curvatureHeuristic(start, node):
     """ for now, the heuristic measures curvature via
@@ -127,7 +127,7 @@ def manhattanDistance(currPos, nextPos):
     xy1 = currPos
     xy2 = nextPos
     distance = abs(float(xy1.getLat()) - float(xy2.getLat())) + abs(float(xy1.getLon()) - float(xy2.getLon()))
-    print "distance between", currPos.getId(), " and ", nextPos.getId(), " = ", distance
+    print "distance between", currPos, " and ", nextPos, " = ", distance
     return distance
 
 

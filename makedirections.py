@@ -1,8 +1,7 @@
 from treeelements import *
 import math
 # below only used in testing, remove later
-from readgeodata import *
-import routesearch
+from readgeodata import OsmDataReader
 
 def generateDirections(nodelist):
     """
@@ -141,8 +140,7 @@ def getBearing(start,end):
     
 if __name__ == "__main__":
     # create test list
-    #testids = ["72088866","1354509391","2133302537","72053830","1353506942","2133302496","72062153","72075396","72084662","72014487","71987051","72066712"] # these aren't actually all neighbours
-    testids = routesearch.startSearch(20)
+    testids = ["72088866","1354509391","2133302537","72053830","1353506942","2133302496","72062153","72075396","72084662","72014487","71987051","72066712"] # these aren't actually all neighbours
     mhcdata = OsmDataReader("mhc.osm.xml")
     searchnodes = mhcdata.createSearchGraph()
     testlist = [ searchnodes[id] for id in testids ]
