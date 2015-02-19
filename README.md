@@ -3,7 +3,7 @@ routeplanner
 
 CS334 AI final project, Fall 2014 - plan routes depending on features (Mount Holyoke College)
 
-There's a demo of the project [on youtube](http://youtu.be/Kz90bZeNiqg)!
+There's a demo of this project [on youtube](http://youtu.be/Kz90bZeNiqg)!
 
 To test the routeplanner yourself:
 
