@@ -3,7 +3,9 @@ routeplanner
 
 CS334 AI final project, Fall 2014 - plan routes depending on features (Mount Holyoke College)
 
-To test the routeplanner:
+There's a demo of the project [on youtube](http://youtu.be/Kz90bZeNiqg)!
+
+To test the routeplanner yourself:
 
 * clone the project locally
 * make sure you have Python with [Flask](http://flask.pocoo.org/) installed
